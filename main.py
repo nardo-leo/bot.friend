@@ -1,10 +1,10 @@
 import requests
-import bs4
+from bs4 import BeautifulSoup
 
 
 url = 'https://www.bolshoi.ru/visit/buyingnew/'
 response = requests.get(url)
-soup = bs4.BeautifulSoup(response.text, 'html.parser')
+soup = BeautifulSoup(response.text, 'html.parser')
 
 dec_text = 'График продажи билетов на НОЯБРЬ и ДЕКАБРЬ 2020 г.\n\t\t\t с учетом ограничения посетителей до 25% вместимости зрительного зала'
 text_block = soup.find('div', attrs={'class', 'text_content_block'})
