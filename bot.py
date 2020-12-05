@@ -1,4 +1,8 @@
 import os
+from threading import Thread
+from time import sleep
+
+import schedule
 import telebot
 import dotenv
 
@@ -12,6 +16,12 @@ bot = telebot.TeleBot(os.getenv('TOKEN'))
 
 chat_id_with_me = os.getenv('CHAT_ID_WITH_ME')
 
+
+def schedule_checker():
+    while True:
+        schedule.run_pending()
+        sleep(1)
+
 # ping
 @bot.message_handler(commands=['ping'])
 def ping(message):
@@ -22,10 +32,17 @@ def ping(message):
 
 
 # send notify about new Nutcracker schedule in Bolshoi
-parser = ParserBolshoi('https://www.bolshoi.ru/visit/buyingnew/')
-nutcracker_msg = parser.run()
+def main():
+    parser = ParserBolshoi('https://www.bolshoi.ru/visit/buyingnew/')
+    nutcracker_msg = parser.run()
 
-bot.send_message(chat_id_with_me, nutcracker_msg, parse_mode='HTML')
+    bot.send_message(chat_id_with_me, nutcracker_msg, parse_mode='HTML')
 
-# polling
-bot.polling()
+
+if __name__ == '__main__':
+    schedule.every().day.at('14:00').do(main)
+
+    Thread(target=schedule_checker).start()
+
+    # polling
+    bot.polling()
